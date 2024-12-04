@@ -4,6 +4,7 @@ import { FormData } from '../types/form';
 import { PersonalInfoSection } from './form/PersonalInfoSection';
 import { EventDetailsSection } from './form/EventDetailsSection';
 import { ServicesSection } from './form/ServicesSection';
+import axios from 'axios';
 
 export function ContactForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -59,7 +60,7 @@ export function ContactForm() {
       setFormData((prev) => ({
         ...prev,
         [section]: {
-          ...prev[section as keyof FormData],
+          ...prev[section as keyof typeof formData],
           [field]: type === 'number' ? Number(value) : value
         }
       }));
@@ -72,11 +73,57 @@ export function ContactForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle form submission here
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Mapear claves a los nombres de columna correctos
+  const flatData = {
+    nombre_solicitante: formData.nombre_solicitante,
+    cargo: formData.cargo,
+    gestion_entidad: formData.gestion_entidad,
+    direccion: formData.direccion,
+    telefono_ext: formData.telefono_ext,
+    numero_participantes: formData.numero_participantes,
+    nombre_evento: formData.nombre_evento,
+    fecha_evento: formData.fecha_evento,
+    horario_inicio: formData.horario_inicio,
+    horario_fin: formData.horario_fin,
+    genera_ingresos: formData.genera_ingresos,
+    espacio_solicitado: formData.espacio_solicitado,
+    cantidad_agua: formData.servicios_basicos.agua,
+    cantidad_tinto: formData.servicios_basicos.tinto,
+    cantidad_refrigerio: formData.servicios_basicos.refrigerio,
+    cantidad_almuerzo: formData.servicios_basicos.almuerzo,
+    cantidad_banderas: formData.servicios_ceremoniales.banderas,
+    cantidad_himnos: formData.servicios_ceremoniales.himnos,
+    cantidad_flores: formData.servicios_ceremoniales.flores,
+    cantidad_vasos_sagrados: formData.servicios_ceremoniales.vasos_sagrados,
+    cantidad_sillas: formData.servicios_ceremoniales.sillas,
+    otros_servicios: formData.otros_servicios,
+    cantidad_pantallas: formData.servicios_tecnicos.pantallas,
+    cantidad_computadores: formData.servicios_tecnicos.computadores,
+    cantidad_video_beams: formData.servicios_tecnicos.video_beams,
+    cantidad_papelografos: formData.servicios_tecnicos.papelografos,
+    cantidad_grabadoras: formData.servicios_tecnicos.grabadoras,
+    cantidad_microfonos: formData.servicios_tecnicos.microfonos,
   };
+
+  console.log('Submitting flat data:', flatData);
+
+  try {
+    const response = await axios.post('http://localhost:5005/solicitudes/create', flatData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Form submitted successfully:', response.data);
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+};
+
+  
 
   return (
     <div id="contact-form" className="bg-gray-50 py-16">
