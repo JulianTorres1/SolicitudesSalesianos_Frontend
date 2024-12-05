@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send } from 'lucide-react';
+import { Send} from 'lucide-react';
 import { FormData } from '../types/form';
 import { PersonalInfoSection } from './form/PersonalInfoSection';
 import { EventDetailsSection } from './form/EventDetailsSection';
@@ -43,6 +43,7 @@ export function ContactForm() {
     },
     otros_servicios: ''
   });
+  const [buttonText, setButtonText] = useState('Enviar Solicitud');
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -111,13 +112,15 @@ const handleSubmit = async (e: React.FormEvent) => {
   console.log('Submitting flat data:', flatData);
 
   try {
-    const response = await axios.post('http://localhost:5005/solicitudes/create', flatData, {
+    await axios.post('http://localhost:5005/solicitudes/create', flatData, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    console.log('Form submitted successfully:', response.data);
+    console.log('Form submitted successfully:');
+    setButtonText('Solicitud Enviada');
+
   } catch (error) {
     console.error('Error submitting form:', error);
   }
@@ -145,7 +148,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   type="submit"
                   className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Enviar Solicitud
+                  {buttonText}
                   <Send className="ml-2 h-4 w-4" />
                 </button>
               </div>
